@@ -24,7 +24,7 @@ def load_tabs():
         subprocess.run([
             'osascript', '-s', 's',
             '-e', 'tell app "Safari"',
-            '-e', 'get {name, URL} of tabs of window 1',
+            '-e', '  get {name, URL} of tabs of window 1',
             '-e', 'end tell'
         ], capture_output=True).stdout.decode('utf-8').strip()
     )
