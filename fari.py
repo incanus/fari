@@ -20,16 +20,18 @@ def load_tabs():
             '-e', 'end tell'
         ], capture_output=True).stdout.decode('utf-8').strip()
     )
-    details = json.loads(re.sub('},\s{', '],[', re.sub('}}$', ']]', re.sub('^{{', '[[',
+    details = str(
         subprocess.run([
             'osascript', '-s', 's',
             '-e', 'tell app "Safari"',
             '-e', 'get {name, URL} of tabs of window 1',
             '-e', 'end tell'
         ], capture_output=True).stdout.decode('utf-8').strip()
-    ))))
-    for i in range(len(details[0])):
-        tabs.append({'name': details[0][i], 'url': details[1][i]})
+    )
+    details = re.sub('},\s{', '],[', re.sub('}}$', ']]', re.sub('^{{', '[[', details)))
+    details_json = json.loads(details)
+    for i in range(len(details_json[0])):
+        tabs.append({'name': details_json[0][i], 'url': details_json[1][i]})
 
 def main(s):
     if args.browse or True:
@@ -39,11 +41,15 @@ def main(s):
             s.clear()
             count = len(tabs)
             show = SHOW_MAX if count - first >= SHOW_MAX else count - first
-            s.addstr(0, 0, f"Choose a tab "
-                           f"[{first + 1}-{first + show} of {count}]:", curses.A_STANDOUT)
+            s.addstr(
+                0, 0,
+                f"Choose a tab "
+                f"[{first + 1}-{first + show} of {count}]:",
+                curses.A_STANDOUT
+            )
             for row in range(show):
-                label = tabs[first + row]['name'][:30].ljust(30)
-                url = re.sub('^https?://(www\.)?', '', tabs[first + row]['url'])[:20]
+                label = tabs[first + row]['name'][:45].ljust(45)
+                url = re.sub('^https?://(www\.)?', '', tabs[first + row]['url'])[:35]
                 s.addstr(row + 2, 0, f"{row}. {label} ({url})")
             last = f"-{show - 1}" if show - 1 >= 1 else ""
             s.addstr(13, 0, f"[0{last}] to open, [<] or [>] to page, [q] to quit:")
@@ -64,7 +70,10 @@ def main(s):
                     pass
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-b", "--browse", action="store_true", help="browse tabs to open")
+parser.add_argument(
+    "-b", "--browse",
+    action="store_true", help="browse tabs to open"
+)
 args = parser.parse_args()
 
 curses.wrapper(main)
