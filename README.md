@@ -2,6 +2,8 @@
 
 fari is a console application for quickly browsing, searching, and opening Safari tabs. I find it faster to navigate things with the keyboard, and fari is even faster than using Safari's built-in tab navigation shortcuts. 
 
+If you care, it's written in Python 3 and should work out of the box on any modern Mac. 
+
 ## Screenshot
 
 ![](fari.gif)
