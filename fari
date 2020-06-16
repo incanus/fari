@@ -10,8 +10,7 @@ SHOW_MAX = 10
 
 tabs = []
 
-def load_tabs():
-    global tabs
+def get_tab_count():
     count = int(
         subprocess.run([
             'osascript',
@@ -20,6 +19,11 @@ def load_tabs():
             '-e', 'end tell'
         ], capture_output=True).stdout.decode('utf-8').strip()
     )
+    return count
+
+def load_tabs():
+    global tabs
+    tabs = []
     details = str(
         subprocess.run([
             'osascript', '-s', 's',
@@ -77,13 +81,19 @@ def open_url(url):
 
 def main(s):
     if args.browse or True:
-        load_tabs()
-        first = 0
-        highlighted = -1
-        s.clear()
+        s.timeout(500)
         while True:
-            (count, show) = paint_urls(s, tabs, first, highlighted)
-            key = s.getkey(14, 0)
+            key = None
+            try:
+                key = s.getkey(14, 0)
+            except: 
+                pass
+            if get_tab_count() != len(tabs):
+                load_tabs()
+                first = 0
+                highlighted = -1
+                s.clear()
+                (count, show) = paint_urls(s, tabs, first, highlighted)
             if key == '<':
                 first -= SHOW_MAX
                 first = 0 if first < 0 else first
@@ -114,7 +124,11 @@ def main(s):
                 term = ''
                 pos = s.getyx()
                 while searching:
-                    key = s.getkey()
+                    key = None
+                    try:
+                        key = s.getkey()
+                    except:
+                        pass
                     if key == 'KEY_BACKSPACE' and len(term) > 0:
                         term = term[0:len(term)-1]
                         s.addstr(pos[0], pos[1] + len(term), ' ')
@@ -132,9 +146,9 @@ def main(s):
                     elif key == ' ':
                         searching = False
                         highlighted = -1
-                    elif re.match('KEY_', key) or key == '>':
+                    elif (key and re.match('KEY_', key)) or key == '>':
                         pass
-                    elif re.match('[a-z0-9/=-_#\.\?]', key):
+                    elif key and re.match('[a-z0-9/=-_#\.\?]', key):
                         term += key
                         s.addstr(pos[0], pos[1] + len(term) - 1, key)
                         highlighted = -1
@@ -148,8 +162,10 @@ def main(s):
                 s.hline(14, 0, ' ', s.getmaxyx()[1])
                 count = old_count
                 first = old_first
-            elif re.match('[0-9]', key):
+            elif key and re.match('[0-9]', key):
                 open_url(tabs[first + int(key)]['url'])
+            if key:
+                (count, show) = paint_urls(s, tabs, first, highlighted)
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
