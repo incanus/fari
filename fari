@@ -77,8 +77,8 @@ def paint_urls(s, tabs, first, highlighted=-1):
     s.addstr(
         toolbar_row, 0,
         f"[0{last}: Open] "
-        f"[<: Prev] "
-        f"[>: Next] "
+        f"[<: Prev Pg] "
+        f"[>: Next Pg] "
         f"[/: Search] "
         f"[q: Quit]".ljust(x),
         curses.A_STANDOUT
