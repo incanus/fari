@@ -36,7 +36,6 @@ def load_tabs():
               re.sub('}}$', ']]',
               re.sub('^{{', '[[',
               re.sub('missing value', '"(blank tab)"', details))))
-    print(details)
     details_json = json.loads(details)
     for i in range(len(details_json[0])):
         tabs.append({'name': details_json[0][i], 'url': details_json[1][i]})
