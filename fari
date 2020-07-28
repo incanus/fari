@@ -50,8 +50,8 @@ def paint_urls(s, tabs, first, highlighted=-1):
     show = lines if count - first >= lines else count - first
     s.addstr(
         0, 0,
-        f"Choose a tab to open "
-        f"[{first + 1}-{first + show} of {count}]:".ljust(x),
+        f"Choose a tab to switch to "
+        f"[showing {first + 1}-{first + show} of {count}]:".ljust(x),
         curses.A_STANDOUT
     )
     label_length = round(x / 2)
@@ -71,15 +71,16 @@ def paint_urls(s, tabs, first, highlighted=-1):
             s.addstr(row + 2, 0, f"{row}.".ljust(3))
         s.addstr(f" {label} ")
         s.addstr(f"{url}", curses.A_UNDERLINE)
-    last = f"-{show - 1}" if show - 1 >= 1 else ''
+    last = f"-{min(show - 1, 9)}" if show >= 2 else ''
     toolbar_row = lines + 3
     s.hline(toolbar_row, 0, ' ', x)
     s.addstr(
         toolbar_row, 0,
-        f"[0{last}: Open] "
-        f"[<: Prev Pg] "
-        f"[>: Next Pg] "
-        f"[/: Search] "
+        f"[↑↓: Nav] "
+        f"[0{last} →: Go] "
+        f"[<: Prev] "
+        f"[>: Next] "
+        f"[/: ?] "
         f"[q: Quit]".ljust(x),
         curses.A_STANDOUT
     )
