@@ -65,12 +65,16 @@ def paint_urls(s, tabs, first, highlighted=-1):
         url = re.sub('^https?://(www\.)?', '', url)
         url = re.sub('/$', '', url)
         url = url[:url_length]
+        base = f"{row}. ".ljust(4) + label + ' '
         if row == highlighted:
-            s.addstr(row + 2, 0, f"{row}>".ljust(3), curses.A_STANDOUT)
+            s.addstr(
+                row + 2, 0,
+                base + url.ljust(url_length),
+                curses.A_STANDOUT
+            )
         else:
-            s.addstr(row + 2, 0, f"{row}.".ljust(3))
-        s.addstr(f" {label} ")
-        s.addstr(f"{url}", curses.A_UNDERLINE)
+            s.addstr(row + 2, 0, base)
+            s.addstr(url, curses.A_UNDERLINE)
     last = f"-{min(show - 1, 9)}" if show >= 2 else ''
     toolbar_row = lines + 3
     s.hline(toolbar_row, 0, ' ', x)
