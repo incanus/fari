@@ -141,7 +141,8 @@ def main(s):
                         elif highlighted < show - 1 and key == 'KEY_DOWN':
                             highlighted += 1
                     elif key == 'KEY_RIGHT' and highlighted > -1:
-                        open_url(tabs[first + highlighted]['url'])
+                        visible_tabs = search_tabs if search_tabs else tabs
+                        open_url(visible_tabs[first + highlighted]['url'])
                         highlighted = -1
                     elif key == ' ':
                         searching = False
