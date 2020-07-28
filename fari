@@ -88,7 +88,7 @@ def open_url(url):
     subprocess.run(['open', url])
 
 def main(s):
-    if args.browse or True:
+    if args.browse:
         s.timeout(500)
         while True:
             key = None
@@ -179,8 +179,12 @@ def main(s):
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "-b", "--browse",
-    action="store_true", help="browse tabs to open"
+    '-b',
+    action='store_true',
+    help='browse tabs (default behavior)',
+    dest='browse',
+    default=True
+)
 parser.add_argument(
     '-c',
     action='store',
