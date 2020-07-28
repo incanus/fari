@@ -16,7 +16,7 @@ Keystrokes are labeled in the application itself, but for reference:
 
 `<` & `>`: Page back/forward through tabs
 
-`/`: Search all tabs (`<space>` to exit search)
+`/`: Search all tabs (`<space>` to exit search, `Fn-Delete to backspace`)
 
 `q`: Quit
 
@@ -27,7 +27,6 @@ Keystrokes are labeled in the application itself, but for reference:
 ## Bugs & current quirks
 
 - Only works on the first or main window of tabs (whatever Safari thinks that is). 
-- Search only lets you see results, but not then navigate the search subset. Basically, you can find out if a tab exists, but it's up to you to find it in order to act on it. 
 - Could be more resource-friendly; fari currently polls frequently to see if the tab count has changed in order to reload the view so that it's not stale.
 - Related to the above, the view won't refresh if you merely rearrange tabs. 
 
