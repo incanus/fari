@@ -88,104 +88,96 @@ def open_url(url):
     subprocess.run(['open', url])
 
 def main(s):
-    if args.browse:
-        s.timeout(500)
-        while True:
-            prompt_line = show_lines(s) + 4
-            key = None
-            try:
-                key = s.getkey(prompt_line, 0)
-            except: 
-                pass
-            if get_tab_count() != len(tabs):
-                load_tabs()
-                first = 0
+    s.timeout(500)
+    while True:
+        prompt_line = show_lines(s) + 4
+        key = None
+        try:
+            key = s.getkey(prompt_line, 0)
+        except: 
+            pass
+        if get_tab_count() != len(tabs):
+            load_tabs()
+            first = 0
+            highlighted = -1
+            s.clear()
+            (count, show) = paint_urls(s, tabs, first, highlighted)
+        if key == '<':
+            first -= show_lines(s)
+            first = 0 if first < 0 else first
+            highlighted = -1
+        elif key == '>':
+            if first + args.count < count:
+                first += args.count
                 highlighted = -1
-                s.clear()
-                (count, show) = paint_urls(s, tabs, first, highlighted)
-            if key == '<':
-                first -= show_lines(s)
-                first = 0 if first < 0 else first
-                highlighted = -1
-            elif key == '>':
-                if first + args.count < count:
-                    first += args.count
+        elif key == 'q':
+            break
+        elif key == 'KEY_UP' or key == 'KEY_DOWN':
+            if highlighted == -1:
+                highlighted = 0
+            elif highlighted > 0 and key == 'KEY_UP':
+                highlighted -= 1
+            elif highlighted < show - 1 and key == 'KEY_DOWN':
+                highlighted += 1
+        elif key == 'KEY_RIGHT' and highlighted > -1:
+            open_url(tabs[first + highlighted]['url'])
+            highlighted = -1
+        elif key == '/':
+            highlighted = -1
+            (count, show) = paint_urls(s, tabs, 0)
+            old_count = count
+            old_first = first
+            s.addstr('Search [space to exit]:', curses.A_STANDOUT)
+            s.addstr(' ')
+            searching = True
+            term = ''
+            pos = s.getyx()
+            while searching:
+                key = None
+                try:
+                    key = s.getkey()
+                except:
+                    pass
+                if key == 'KEY_DC' and len(term) > 0:
+                    term = term[0:len(term)-1]
+                    s.addstr(pos[0], pos[1] + len(term), ' ')
+                    s.move(pos[0], pos[1] + len(term))
+                elif key == 'KEY_UP' or key == 'KEY_DOWN':
+                    if highlighted == -1:
+                        highlighted = 0
+                    elif highlighted > 0 and key == 'KEY_UP':
+                        highlighted -= 1
+                    elif highlighted < show - 1 and key == 'KEY_DOWN':
+                        highlighted += 1
+                elif key == 'KEY_RIGHT' and highlighted > -1:
+                    visible_tabs = search_tabs if search_tabs else tabs
+                    open_url(visible_tabs[first + highlighted]['url'])
                     highlighted = -1
-            elif key == 'q':
-                break
-            elif key == 'KEY_UP' or key == 'KEY_DOWN':
-                if highlighted == -1:
-                    highlighted = 0
-                elif highlighted > 0 and key == 'KEY_UP':
-                    highlighted -= 1
-                elif highlighted < show - 1 and key == 'KEY_DOWN':
-                    highlighted += 1
-            elif key == 'KEY_RIGHT' and highlighted > -1:
-                open_url(tabs[first + highlighted]['url'])
-                highlighted = -1
-            elif key == '/':
-                highlighted = -1
-                (count, show) = paint_urls(s, tabs, 0)
-                old_count = count
-                old_first = first
-                s.addstr('Search [space to exit]:', curses.A_STANDOUT)
-                s.addstr(' ')
-                searching = True
-                term = ''
-                pos = s.getyx()
-                while searching:
-                    key = None
-                    try:
-                        key = s.getkey()
-                    except:
-                        pass
-                    if key == 'KEY_DC' and len(term) > 0:
-                        term = term[0:len(term)-1]
-                        s.addstr(pos[0], pos[1] + len(term), ' ')
-                        s.move(pos[0], pos[1] + len(term))
-                    elif key == 'KEY_UP' or key == 'KEY_DOWN':
-                        if highlighted == -1:
-                            highlighted = 0
-                        elif highlighted > 0 and key == 'KEY_UP':
-                            highlighted -= 1
-                        elif highlighted < show - 1 and key == 'KEY_DOWN':
-                            highlighted += 1
-                    elif key == 'KEY_RIGHT' and highlighted > -1:
-                        visible_tabs = search_tabs if search_tabs else tabs
-                        open_url(visible_tabs[first + highlighted]['url'])
-                        highlighted = -1
-                    elif key == ' ':
-                        searching = False
-                        highlighted = -1
-                    elif (key and re.match('KEY_', key)) or key == '>':
-                        pass
-                    elif key and re.match('[a-z0-9/=-_#\.\?]', key):
-                        term += key
-                        s.addstr(pos[0], pos[1] + len(term) - 1, key)
-                        highlighted = -1
-                    if len(term) > 0:
-                        term = term.lower()
-                        search_tabs = []
-                        for tab in tabs:
-                            if tab['name'].lower().find(term) > -1 or re.sub('^https?://(www\.)?', '', tab['url']).lower().find(term) > -1:
-                                search_tabs.append(tab)
-                        (count, show) = paint_urls(s, search_tabs, 0, highlighted)
-                s.hline(prompt_line, 0, ' ', s.getmaxyx()[1])
-                count = old_count
-                first = old_first
-            elif key and re.match('[0-9]', key):
-                open_url(tabs[first + int(key)]['url'])
-            if key:
-                (count, show) = paint_urls(s, tabs, first, highlighted)
+                elif key == ' ':
+                    searching = False
+                    highlighted = -1
+                elif (key and re.match('KEY_', key)) or key == '>':
+                    pass
+                elif key and re.match('[a-z0-9/=-_#\.\?]', key):
+                    term += key
+                    s.addstr(pos[0], pos[1] + len(term) - 1, key)
+                    highlighted = -1
+                if len(term) > 0:
+                    term = term.lower()
+                    search_tabs = []
+                    for tab in tabs:
+                        if tab['name'].lower().find(term) > -1 or re.sub('^https?://(www\.)?', '', tab['url']).lower().find(term) > -1:
+                            search_tabs.append(tab)
+                    (count, show) = paint_urls(s, search_tabs, 0, highlighted)
+            s.hline(prompt_line, 0, ' ', s.getmaxyx()[1])
+            count = old_count
+            first = old_first
+        elif key and re.match('[0-9]', key):
+            open_url(tabs[first + int(key)]['url'])
+        if key:
+            (count, show) = paint_urls(s, tabs, first, highlighted)
 
 parser = argparse.ArgumentParser()
-parser.add_argument(
-    '-b',
-    action='store_true',
-    help='browse tabs (default behavior)',
-    dest='browse',
-    default=True
-)
 parser.add_argument(
     '-c',
     action='store',
