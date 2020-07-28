@@ -61,9 +61,9 @@ def paint_urls(s, tabs, first, highlighted=-1):
         url = re.sub('^https?://(www\.)?', '', url)
         url = url[:url_length].ljust(url_length)
         if row == highlighted:
-            s.addstr(row + 2, 0, f"{row}> ", curses.A_STANDOUT)
+            s.addstr(row + 2, 0, f"{row}>".ljust(4), curses.A_STANDOUT)
         else:
-            s.addstr(row + 2, 0, f"{row}. ")
+            s.addstr(row + 2, 0, f"{row}.".ljust(4))
         s.addstr(f"{label} ")
         s.addstr(f"{url}", curses.A_UNDERLINE)
     last = f"-{show - 1}" if show - 1 >= 1 else ""
