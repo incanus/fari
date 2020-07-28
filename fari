@@ -91,6 +91,7 @@ def open_url(url):
 
 def main(s):
     s.timeout(3000)
+    first_pass = True
     while True:
         tab_count = get_tab_count()
         if tab_count == 0:
@@ -105,10 +106,13 @@ def main(s):
             next
         prompt_line = get_display_count(s) + 4
         key = None
-        try:
-            key = s.getkey(prompt_line, 0)
-        except: 
-            pass
+        if first_pass:
+            first_pass = False
+        else:
+            try:
+                key = s.getkey(prompt_line, 0)
+            except: 
+                pass
         if tab_count != len(tabs):
             load_tabs()
             first = 0
