@@ -5,8 +5,7 @@ import curses
 import json
 import re
 import subprocess
-
-SHOW_MAX = 10
+import sys
 
 tabs = []
 
@@ -40,19 +39,23 @@ def load_tabs():
     for i in range(len(details_json[0])):
         tabs.append({'name': details_json[0][i], 'url': details_json[1][i]})
 
+def show_lines(s):
+    return min(args.count, s.getmaxyx()[0] - 5)
+
 def paint_urls(s, tabs, first, highlighted=-1):
     x = s.getmaxyx()[1]
+    lines = show_lines(s)
     count = len(tabs)
-    show = SHOW_MAX if count - first >= SHOW_MAX else count - first
+    show = lines if count - first >= lines else count - first
     s.addstr(
         0, 0,
         f"Choose a tab "
         f"[{first + 1}-{first + show} of {count}]:".ljust(x),
         curses.A_STANDOUT
     )
-    for clear_row in range(SHOW_MAX):
     label_length = round(x / 2)
     url_length = x - label_length - 5
+    for clear_row in range(lines):
         s.hline(clear_row + 2, 0, ' ', x)
     for row in range(show):
         label = tabs[first + row]['name']
@@ -66,14 +69,16 @@ def paint_urls(s, tabs, first, highlighted=-1):
             s.addstr(row + 2, 0, f"{row}.".ljust(4))
         s.addstr(f"{label} ")
         s.addstr(f"{url}", curses.A_UNDERLINE)
-    last = f"-{show - 1}" if show - 1 >= 1 else ""
-    s.hline(13, 0, ' ', x)
+    last = f"-{show - 1}" if show - 1 >= 1 else ''
+    toolbar_row = lines + 3
+    s.hline(toolbar_row, 0, ' ', x)
     s.addstr(
-        13, 0, f"[0{last}: Open] "
-               f"[<: Prev] "
-               f"[>: Next] "
-               f"[/: Search] "
-               f"[q: Quit]".ljust(x),
+        toolbar_row, 0,
+        f"[0{last}: Open] "
+        f"[<: Prev] "
+        f"[>: Next] "
+        f"[/: Search] "
+        f"[q: Quit]".ljust(x),
         curses.A_STANDOUT
     )
     s.refresh()
@@ -98,12 +103,12 @@ def main(s):
                 s.clear()
                 (count, show) = paint_urls(s, tabs, first, highlighted)
             if key == '<':
-                first -= SHOW_MAX
+                first -= show_lines(s)
                 first = 0 if first < 0 else first
                 highlighted = -1
             elif key == '>':
-                if first + SHOW_MAX < count:
-                    first += SHOW_MAX
+                if first + args.count < count:
+                    first += args.count
                     highlighted = -1
             elif key == 'q':
                 break
@@ -176,6 +181,14 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "-b", "--browse",
     action="store_true", help="browse tabs to open"
+parser.add_argument(
+    '-c',
+    action='store',
+    help='number of tabs to show per page',
+    dest='count',
+    type=int,
+    metavar='COUNT',
+    default=sys.maxsize
 )
 args = parser.parse_args()
 curses.wrapper(main)
