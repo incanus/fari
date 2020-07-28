@@ -129,7 +129,7 @@ def main(s):
                         key = s.getkey()
                     except:
                         pass
-                    if key == 'KEY_BACKSPACE' and len(term) > 0:
+                    if key == 'KEY_DC' and len(term) > 0:
                         term = term[0:len(term)-1]
                         s.addstr(pos[0], pos[1] + len(term), ' ')
                         s.move(pos[0], pos[1] + len(term))
