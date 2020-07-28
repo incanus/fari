@@ -10,34 +10,35 @@ import sys
 tabs = []
 
 def get_tab_count():
-    count = int(
-        subprocess.run([
-            'osascript',
-            '-e', 'tell app "Safari"',
-            '-e', '  get count of tabs of window 1',
-            '-e', 'end tell'
-        ], capture_output=True).stdout.decode('utf-8').strip()
-    )
-    return count
+    capture = subprocess.run([
+        'osascript',
+        '-e', 'tell app "Safari"',
+        '-e', '  get count of tabs of window 1',
+        '-e', 'end tell'
+    ], capture_output=True)
+    if capture.stderr:
+        return 0
+    else:
+        return int(capture.stdout.decode('utf-8').strip())
 
 def load_tabs():
     global tabs
     tabs = []
-    details = str(
-        subprocess.run([
-            'osascript', '-s', 's',
-            '-e', 'tell app "Safari"',
-            '-e', '  get {name, URL} of tabs of window 1',
-            '-e', 'end tell'
-        ], capture_output=True).stdout.decode('utf-8').strip()
-    )
-    details = re.sub('},\s{', '],[',
-              re.sub('}}$', ']]',
-              re.sub('^{{', '[[',
-              re.sub('missing value', '"(blank tab)"', details))))
-    details_json = json.loads(details)
-    for i in range(len(details_json[0])):
-        tabs.append({'name': details_json[0][i], 'url': details_json[1][i]})
+    capture = subprocess.run([
+        'osascript', '-s', 's',
+        '-e', 'tell app "Safari"',
+        '-e', '  get {name, URL} of tabs of window 1',
+        '-e', 'end tell'
+    ], capture_output=True)
+    if not capture.stderr:
+        details = capture.stdout.decode('utf-8').strip()
+        details = re.sub('},\s{', '],[',
+                  re.sub('}}$', ']]',
+                  re.sub('^{{', '[[',
+                  re.sub('missing value', '"(blank tab)"', details))))
+        details_json = json.loads(details)
+        for i in range(len(details_json[0])):
+            tabs.append({'name': details_json[0][i], 'url': details_json[1][i]})
 
 def show_lines(s):
     return min(args.count, s.getmaxyx()[0] - 5)
@@ -90,13 +91,24 @@ def open_url(url):
 def main(s):
     s.timeout(3000)
     while True:
+        tab_count = get_tab_count()
+        if tab_count == 0:
+            s.clear()
+            (y, x) = s.getmaxyx()
+            message = 'No open tabs!'
+            s.addstr(
+                round(y / 2) - 1,
+                round(x / 2) - round(len(message) / 2),
+                message
+            )
+            next
         prompt_line = show_lines(s) + 4
         key = None
         try:
             key = s.getkey(prompt_line, 0)
         except: 
             pass
-        if get_tab_count() != len(tabs):
+        if tab_count != len(tabs):
             load_tabs()
             first = 0
             highlighted = -1
@@ -174,7 +186,7 @@ def main(s):
             first = old_first
         elif key and re.match('[0-9]', key):
             open_url(tabs[first + int(key)]['url'])
-        if key:
+        if key and tab_count:
             (count, show) = paint_urls(s, tabs, first, highlighted)
 
 parser = argparse.ArgumentParser()
