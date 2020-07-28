@@ -40,12 +40,12 @@ def load_tabs():
         for i in range(len(details_json[0])):
             tabs.append({'name': details_json[0][i], 'url': details_json[1][i]})
 
-def show_lines(s):
+def get_display_count(s):
     return min(args.count, s.getmaxyx()[0] - 5)
 
 def paint_urls(s, tabs, first, highlighted=-1):
     x = s.getmaxyx()[1]
-    lines = show_lines(s)
+    lines = get_display_count(s)
     count = len(tabs)
     show = lines if count - first >= lines else count - first
     s.addstr(
@@ -102,7 +102,7 @@ def main(s):
                 message
             )
             next
-        prompt_line = show_lines(s) + 4
+        prompt_line = get_display_count(s) + 4
         key = None
         try:
             key = s.getkey(prompt_line, 0)
@@ -115,7 +115,7 @@ def main(s):
             s.clear()
             (count, show) = paint_urls(s, tabs, first, highlighted)
         if key == '<':
-            first -= show_lines(s)
+            first -= get_display_count(s)
             first = 0 if first < 0 else first
             highlighted = -1
         elif key == '>':
