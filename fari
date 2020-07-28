@@ -92,7 +92,8 @@ def paint_urls(s, tabs, first, highlighted=-1):
     return (count, show)
 
 def open_url(url):
-    subprocess.run(['open', url])
+    capture = subprocess.run(['open', url], capture_output=True)
+    return capture.stderr
 
 def main(s):
     s.timeout(3000)
@@ -138,8 +139,8 @@ def main(s):
             elif highlighted < show - 1 and key == 'KEY_DOWN':
                 highlighted += 1
         elif key == 'KEY_RIGHT' and highlighted > -1:
-            open_url(tabs[first + highlighted]['url'])
-            highlighted = -1
+            if not open_url(tabs[first + highlighted]['url']):
+                highlighted = -1
         elif key == '/':
             highlighted = -1
             (count, show) = paint_urls(s, tabs, 0)
