@@ -91,9 +91,10 @@ def main(s):
     if args.browse:
         s.timeout(500)
         while True:
+            prompt_line = show_lines(s) + 4
             key = None
             try:
-                key = s.getkey(14, 0)
+                key = s.getkey(prompt_line, 0)
             except: 
                 pass
             if get_tab_count() != len(tabs):
@@ -169,7 +170,7 @@ def main(s):
                             if tab['name'].lower().find(term) > -1 or re.sub('^https?://(www\.)?', '', tab['url']).lower().find(term) > -1:
                                 search_tabs.append(tab)
                         (count, show) = paint_urls(s, search_tabs, 0, highlighted)
-                s.hline(14, 0, ' ', s.getmaxyx()[1])
+                s.hline(prompt_line, 0, ' ', s.getmaxyx()[1])
                 count = old_count
                 first = old_first
             elif key and re.match('[0-9]', key):
