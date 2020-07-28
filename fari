@@ -48,10 +48,11 @@ def paint_urls(s, tabs, first, highlighted=-1):
     lines = get_display_count(s)
     count = len(tabs)
     show = lines if count - first >= lines else count - first
+    show_range = f"{first + 1}-{first + show} of {count}" if show > 1 else str(show)
     s.addstr(
         0, 0,
         f"Choose a tab to switch to "
-        f"[showing {first + 1}-{first + show} of {count}]:".ljust(x),
+        f"[showing {show_range}]:".ljust(x),
         curses.A_STANDOUT
     )
     label_length = round(x / 2)
