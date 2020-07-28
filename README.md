@@ -20,9 +20,9 @@ Keystrokes are labeled in the application itself, but for reference:
 
 `q`: Quit
 
-`↑` & `↓`: Move through current page of tabs
+`↑` & `↓`: Move selection through current page of tabs
 
-`→`: Open currently moved-to tab
+`→`: Open currently selected tab
 
 ## Bugs & current quirks
 
