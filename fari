@@ -99,8 +99,9 @@ def main(s):
                 first = 0 if first < 0 else first
                 highlighted = -1
             elif key == '>':
-                first = first + SHOW_MAX if first + SHOW_MAX <= count else first
-                highlighted = -1
+                if first + SHOW_MAX < count:
+                    first += SHOW_MAX
+                    highlighted = -1
             elif key == 'q':
                 break
             elif key == 'KEY_UP' or key == 'KEY_DOWN':
