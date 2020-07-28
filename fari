@@ -98,11 +98,7 @@ def main(s):
             s.clear()
             (y, x) = s.getmaxyx()
             message = 'No open tabs!'
-            s.addstr(
-                round(y / 2) - 1,
-                round(x / 2) - round(len(message) / 2),
-                message
-            )
+            s.addstr(round(y / 2) - 1, 0, message.center(x))
             next
         prompt_line = get_display_count(s) + 4
         key = None
