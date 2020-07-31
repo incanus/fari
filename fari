@@ -139,8 +139,9 @@ def main(s):
             first = 0 if first < 0 else first
             highlighted = -1
         elif key == '>':
-            if first + args.count < count:
-                first += args.count
+            lines = get_display_count(s)
+            if first + lines < count:
+                first += lines
                 highlighted = -1
         elif key == 'q':
             break
