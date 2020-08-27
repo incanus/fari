@@ -24,15 +24,9 @@ Keystrokes are labeled in the application itself, but for reference:
 
 `→`: Open currently selected tab
 
-## Bugs & current quirks
-
-- Only works on the first or main window of tabs (whatever Safari thinks that is). 
-- Could be more resource-friendly; fari currently polls frequently to see if the tab count has changed in order to reload the view so that it's not stale.
-- Related to the above, the view won't refresh if you merely rearrange tabs. 
-
 ## Future plans
 
-- Fix the above bugs & quirks.
+- Fix bugs & quirks.
 - Allow closing & rearrangement of tabs.
 - Allow splitting & combining of windows. 
 - Allow browsing, pulling from, and pushing to iCloud device tabs (i.e. other Safari instances of yours). 
