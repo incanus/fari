@@ -4,9 +4,13 @@ fari is a console application for quickly browsing, searching, and opening Safar
 
 If you care, it's written in Python 3 and should work out of the box on any modern Mac. 
 
-## Screenshot
+## Screenshot GIF
 
 ![](fari.gif)
+
+## Overview video
+
+<a href="https://vimeo.com/905059924"><img src="fari.png"/></a>
 
 ## Usage
 
